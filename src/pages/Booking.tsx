@@ -1,117 +1,76 @@
-import React, { useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
-import { Hotel } from "../types/hotel"
-import { Booking as BookingType } from "../types/booking"
+import { useParams, useNavigate } from "react-router-dom"
+import { useState } from "react"
+import hotels from "../data/hotels.json"
+import "../styles/Booking.css"
 
-interface LocationState {
-  hotel: Hotel
-  checkIn: string
-  checkOut: string
-  guests: number
-}
-
-const Booking: React.FC = () => {
-  const location = useLocation()
+export default function Booking() {
+  const { id } = useParams()
   const navigate = useNavigate()
-  const { hotel, checkIn, checkOut, guests } = (location.state as LocationState) || {}
-  const [loading, setLoading] = useState(false)
+  const hotel = hotels.find(h => h.id === id)
 
-  if (!hotel) {
-    return <div className="error-message">Booking information not found</div>
-  }
+  const [checkIn, setCheckIn] = useState("")
+  const [checkOut, setCheckOut] = useState("")
+  const [guests, setGuests] = useState(1)
 
-  const checkInDate = new Date(checkIn)
-  const checkOutDate = new Date(checkOut)
-  const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24))
-  const totalPrice = nights * hotel.price
+  if (!hotel) return <p>Hotel not found</p>
 
-  const handleConfirm = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  const nights =
+    checkIn && checkOut
+      ? (new Date(checkOut).getTime() - new Date(checkIn).getTime()) /
+        (1000 * 60 * 60 * 24)
+      : 0
 
-    try {
-      // Create booking object
-      const booking: BookingType = {
-        id: `BK${Date.now()}`,
-        hotelId: hotel.id,
-        hotelName: hotel.name,
-        checkIn,
-        checkOut,
-        guests,
-        totalPrice,
-        status: "confirmed",
-        bookingDate: new Date().toISOString().split("T")[0],
-      }
+  const basePrice = nights > 0 ? nights * hotel.price : 0
+  const tax = Math.round(basePrice * 0.12)
+  const total = basePrice + tax
 
-      // Store booking (in a real app, this would be an API call)
-      const existingBookings = JSON.parse(localStorage.getItem("bookings") || "[]")
-      existingBookings.push(booking)
-      localStorage.setItem("bookings", JSON.stringify(existingBookings))
-
-      navigate("/bookings")
-    } catch (err) {
-      console.error("Booking failed:", err)
-    } finally {
-      setLoading(false)
+  const confirmBooking = () => {
+    const booking = {
+      id: Date.now(),
+      hotel: hotel.name,
+      city: hotel.city,
+      checkIn,
+      checkOut,
+      guests,
+      total
     }
+
+    const prev = JSON.parse(localStorage.getItem("bookings") || "[]")
+    localStorage.setItem("bookings", JSON.stringify([...prev, booking]))
+
+    navigate("/booking/success")
   }
 
   return (
-    <div className="booking-confirm-page">
-      <h1>Confirm Your Booking</h1>
+    <div className="booking">
+      <h1>Confirm Booking</h1>
 
-      <div className="confirm-container">
-        <div className="hotel-summary">
-          <img src={hotel.image} alt={hotel.name} className="summary-image" />
-          <div className="summary-info">
-            <h2>{hotel.name}</h2>
-            <p className="city">📍 {hotel.city}</p>
-            <p className="property-type">{hotel.type}</p>
-          </div>
+      <div className="booking-card">
+        <h2>{hotel.name}</h2>
+        <p>{hotel.city}</p>
+
+        <input type="date" value={checkIn} onChange={e => setCheckIn(e.target.value)} />
+        <input type="date" value={checkOut} onChange={e => setCheckOut(e.target.value)} />
+
+        <select value={guests} onChange={e => setGuests(+e.target.value)}>
+          {[1,2,3,4].map(g => (
+            <option key={g}>{g} Guest{g > 1 && "s"}</option>
+          ))}
+        </select>
+
+        <div className="price">
+          <p>Base: ₹{basePrice}</p>
+          <p>Tax (12%): ₹{tax}</p>
+          <h3>Total: ₹{total}</h3>
         </div>
 
-        <div className="booking-summary">
-          <h3>Booking Details</h3>
-
-          <div className="summary-item">
-            <span className="label">Check-in:</span>
-            <span>{new Date(checkIn).toLocaleDateString()}</span>
-          </div>
-
-          <div className="summary-item">
-            <span className="label">Check-out:</span>
-            <span>{new Date(checkOut).toLocaleDateString()}</span>
-          </div>
-
-          <div className="summary-item">
-            <span className="label">Number of Nights:</span>
-            <span>{nights}</span>
-          </div>
-
-          <div className="summary-item">
-            <span className="label">Guests:</span>
-            <span>{guests}</span>
-          </div>
-
-          <div className="summary-item">
-            <span className="label">Price per Night:</span>
-            <span>₹{hotel.price}</span>
-          </div>
-
-          <div className="summary-item total">
-            <span className="label">Total Price:</span>
-            <span className="total-price">₹{totalPrice}</span>
-          </div>
-
-          <form onSubmit={handleConfirm}>
-            <button type="submit" disabled={loading} className="confirm-button">
-              {loading ? "Processing..." : "Confirm Booking"}
-            </button>
-          </form>
-        </div>
+        <button
+          disabled={!checkIn || !checkOut || nights <= 0}
+          onClick={confirmBooking}
+        >
+          Confirm Booking
+        </button>
       </div>
     </div>
   )
 }
-
-export default Booking

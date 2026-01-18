@@ -1,22 +1,18 @@
 [
   {
     "id": "1",
-    "name": "Sea Breeze Resort",
+    "name": "Ocean View Resort",
     "city": "Goa",
     "price": 4200,
     "rating": 4.6,
-    "type": "Resort",
-    "image": "https://images.unsplash.com/photo-1501117716987-c8e1ecb210b1",
-    "amenities": ["WIFI", "POOL", "AC", "PARKING"]
+    "image": "https://images.unsplash.com/photo-1501117716987-c8e1ecb2101b"
   },
   {
     "id": "2",
-    "name": "Urban Stay",
-    "city": "Bangalore",
-    "price": 2800,
-    "rating": 4.2,
-    "type": "Hotel",
-    "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945",
-    "amenities": ["WIFI", "AC"]
+    "name": "Mountain Bliss Hotel",
+    "city": "Manali",
+    "price": 3100,
+    "rating": 4.4,
+    "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945"
   }
 ]
