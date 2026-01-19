@@ -1,69 +1,38 @@
-import React, { useState } from "react"
+import React from "react"
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "../hooks/useAuth"
+import { useAuth } from "../context/AuthContext"
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
-
-    try {
-      await login(email, password)
+  React.useEffect(() => {
+    if (user) {
       navigate("/")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed")
-    } finally {
-      setLoading(false)
     }
-  }
+  }, [user, navigate])
 
   return (
-    <div className="login-container">
-      <form className="login-form" onSubmit={handleSubmit}>
-        <h1>Login to HotelBooking</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
+      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+        <h1 className="text-3xl font-bold text-center text-slate-900 mb-2">
+          🏨 HotelHub
+        </h1>
+        <p className="text-center text-slate-600 text-sm mb-8">
+          Please sign in to continue
+        </p>
 
-        {error && <div className="error-message">{error}</div>}
-
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-          />
-        </div>
-
-        <button type="submit" disabled={loading} className="submit-button">
-          {loading ? "Logging in..." : "Login"}
+        <button
+          onClick={() => navigate("/")}
+          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all"
+        >
+          Go to Home
         </button>
 
-        <p className="demo-info">
-          Demo: Use any email and password to login
+        <p className="text-center text-slate-500 text-xs mt-6">
+          You must be logged in to access this page. Please use the Sign In button in the navbar.
         </p>
-      </form>
+      </div>
     </div>
   )
 }

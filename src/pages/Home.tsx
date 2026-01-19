@@ -1,9 +1,14 @@
+import React from "react"
 import { useState } from "react"
 import { hotels } from "../data/hotels"
 import HotelCard from "../components/HotelCard"
-import SearchBar from "../components/SearchBar"
+import { SearchBar } from "../components/SearchBar"
 
-const Home = () => {
+interface HomeProps {
+  onOpenAuth?: () => void
+}
+
+const Home = ({ onOpenAuth }: HomeProps) => {
   const [query, setQuery] = useState("")
   const [maxPrice, setMaxPrice] = useState(10000)
   const [minRating, setMinRating] = useState(0)
