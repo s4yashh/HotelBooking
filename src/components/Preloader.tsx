@@ -75,8 +75,12 @@ export const Preloader = ({ onComplete }: PreloaderProps) => {
                   duration: 0.5,
                   delay: 0.4 + index * 0.08,
                 }}
-                style={{ fontSize: '32px' }}
-                className="text-white font-medium tracking-[0.2em]"
+                style={{ 
+                  fontSize: '32px',
+                  fontFamily: 'Roboto, sans-serif',
+                  fontWeight: 590
+                }}
+                className="text-white tracking-[0.2em]"
               >
                 {letter}
               </motion.span>
