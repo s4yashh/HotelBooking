@@ -7,29 +7,16 @@ interface PreloaderProps {
 }
 
 export const Preloader = ({ onComplete }: PreloaderProps) => {
-  const [canEnter, setCanEnter] = useState(false)
-
   useEffect(() => {
-    // Allow entering after 2 seconds
-    const enterTimer = setTimeout(() => {
-      setCanEnter(true)
-    }, 2000)
+    // Auto-complete after one full animation cycle (1.4 seconds)
+    const timer = setTimeout(() => {
+      onComplete()
+    }, 1400)
 
     return () => {
-      clearTimeout(enterTimer)
+      clearTimeout(timer)
     }
-  }, [])
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (canEnter && e.key === 'Enter') {
-        onComplete()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [canEnter, onComplete])
+  }, [onComplete])
 
   return (
     <motion.div
@@ -61,20 +48,10 @@ export const Preloader = ({ onComplete }: PreloaderProps) => {
           transition={{ 
             duration: 1.4, 
             repeat: Infinity, 
-            ease: 'linear',
+            ease: [0.25, 0.46, 0.45, 0.94],
             times: [0, 0.36, 0.4, 1]
           }}
         />
-
-        {/* Instruction Text */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={canEnter ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-          className="text-cyan-400 text-xs font-medium tracking-wide text-center"
-        >
-          Press ENTER to continue
-        </motion.p>
       </div>
     </motion.div>
   )
